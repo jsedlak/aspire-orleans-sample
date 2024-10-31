@@ -8,10 +8,11 @@ builder.AddServiceDefaults();
 builder.AddKeyedAzureTableClient("clustering");
 builder.AddKeyedAzureBlobClient("grain-state");
 
-builder.UseOrleans();
+builder.UseOrleans(o => o.UseDashboard(x => x.HostSelf = true));
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+// app.MapGet("/", () => "OK");
+app.Map("/dashboard", x => x.UseOrleansDashboard());
 
 await app.RunAsync();
