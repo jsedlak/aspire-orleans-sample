@@ -9,19 +9,22 @@ var orleans = builder.AddOrleans("default")
     .WithClustering(cluster)
     .WithGrainStorage("Default", grainStorage);
 
-var apiService = builder.AddProject<Projects.AspireTest_ApiService>("apiservice")
-    .WithReference(orleans.AsClient())
-    .WaitFor(cluster)
-    .WithReplicas(3);
-
-builder.AddProject<Projects.AspireTest_Web>("webfrontend")
-    .WithExternalHttpEndpoints()
-    .WithReference(apiService);
-
-builder.AddProject<Projects.AspireTest_SiloHost>("silo")
+var siloProject = builder.AddProject<Projects.AspireTest_SiloHost>("silo")
     .WithReference(orleans)
     .WaitFor(grainStorage)
     .WaitFor(cluster)
     .WithReplicas(3);
+
+var apiService = builder.AddProject<Projects.AspireTest_ApiService>("apiservice")
+    .WithReference(orleans.AsClient())
+    .WaitFor(siloProject)
+    .WithReplicas(3);
+
+builder.AddProject<Projects.AspireTest_Web>("webfrontend")
+    .WithExternalHttpEndpoints()
+    .WithReference(apiService)
+    .WaitFor(apiService);
+
+
 
 builder.Build().Run();
