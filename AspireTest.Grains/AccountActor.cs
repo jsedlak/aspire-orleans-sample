@@ -20,4 +20,9 @@ public sealed class AccountActor : Grain<AccountState>, IAccountActor
         await WriteStateAsync();
         return State.Balance;
     }
+
+    public Task<AccountState> GetState()
+    {
+        return Task.FromResult(State);
+    }
 }

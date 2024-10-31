@@ -7,4 +7,6 @@ public interface IAccountActor : IGrainWithStringKey
     Task<decimal> Debit(decimal amount);
  
     Task<decimal> Credit(decimal amount);
+    
+    Task<AccountState> GetState();
 }
