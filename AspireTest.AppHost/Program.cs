@@ -7,9 +7,11 @@ var cluster = storage.AddTables("clustering");
 
 var orleans = builder.AddOrleans("default")
     .WithClustering(cluster)
-    .WithGrainStorage(grainStorage);
+    .WithGrainStorage("Default", grainStorage);
 
 var apiService = builder.AddProject<Projects.AspireTest_ApiService>("apiservice")
+    .WithReference(orleans.AsClient())
+    .WaitFor(cluster)
     .WithReplicas(3);
 
 builder.AddProject<Projects.AspireTest_Web>("webfrontend")

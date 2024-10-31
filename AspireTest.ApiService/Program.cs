@@ -1,3 +1,6 @@
+using AspireTest.Grains;
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
@@ -5,6 +8,9 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
+
+builder.AddKeyedAzureTableClient("clustering");
+builder.UseOrleansClient();
 
 var app = builder.Build();
 
@@ -15,6 +21,18 @@ var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
+
+app.MapGet("/account/{id}", async ([FromServices] IClusterClient clusterClient, [FromRoute] string id) =>
+{
+    var account = clusterClient.GetGrain<IAccountActor>(id);
+    await account.Credit((decimal)Random.Shared.NextDouble() * 10000);
+    var result = await account.Debit((decimal)Random.Shared.NextDouble() * 1000);
+
+    return new
+    {
+        balance = result
+    };
+});
 
 app.MapGet("/weatherforecast", () =>
 {
