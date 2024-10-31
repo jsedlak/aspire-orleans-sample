@@ -5,9 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Orleans stuff
-// builder.AddKeyedAzureTableClient("clustering");
-// builder.AddKeyedAzureTableClient("grain-state");
-// builder.AddKeyedRedisClient("redis-clustering");
+builder.AddKeyedAzureTableClient("clustering");
+builder.AddKeyedAzureBlobClient("grain-state");
 
 builder.UseOrleans();
 
